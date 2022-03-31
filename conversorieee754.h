@@ -6,10 +6,10 @@ class ConversorIEEE754
 {
 public:
     ConversorIEEE754();
-    void floattoIEE ();
-    void floattoIEE2 ();
-    void IEEtofloat ();
-    void IEEtofloat2 ();
+    unsigned int floattoIEE ();
+    unsigned int floattoIEE2 ();
+    float IEEtofloat (int signo, int exponente, int mantisa);
+    float IEEtofloat2 ();
 
 private:
     union Code {

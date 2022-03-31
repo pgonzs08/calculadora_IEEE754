@@ -9,54 +9,39 @@
  *
  */
 
-void ConversorIEEE754::floattoIEE (){
+unsigned int ConversorIEEE754::floattoIEE (){
 
     union Code a;
-    printf ("Introduce un número: ");
-    scanf ("%f", &a.numero);
-    printf("Signo: %u \n",a.bitfield.sign);
-    printf("Exponente: %u \n",a.bitfield.expo);
-    printf("Parte Fraccionaria : %u \n", a.bitfield.partFrac);
+    return a.bitfield.partFrac;
 
 }
 
-void ConversorIEEE754::floattoIEE2 (){
+unsigned int ConversorIEEE754::floattoIEE2 (){
 
     union Code a;
     a.numero=2.1;
-    printf("Numero a imprimir: %f \n", a.numero);
-    //printf("Numero unsigned: %u \n", a.numerox);
-    printf("Signo: %u \n",a.bitfield.sign);
-    printf("Exponente: %u \n",a.bitfield.expo);
-    printf("Parte Fraccionaria : %u \n", a.bitfield.partFrac);
+    return a.bitfield.partFrac;
 
 }
 
-void ConversorIEEE754::IEEtofloat (){
+float ConversorIEEE754::IEEtofloat (int signo, int exponente, int mantisa){
 
     union Code a;
-    int b, c, d;
-    printf ("Introduce el signo: ");
-    scanf ("%d", &b);
-    printf ("Introduce el exponente: ");
-    scanf ("%d", &c);
-    printf ("Introduce la mantisa: ");
-    scanf ("%d", &d);
 
-    a.bitfield.sign = b;
-    a.bitfield.expo = c;
-    a.bitfield.partFrac = d;
+    a.bitfield.sign = signo;
+    a.bitfield.expo = exponente;
+    a.bitfield.partFrac = mantisa;
 
-    printf("El número pasado a real es: %f \n", a.numero);
+    return a.numero;
 }
 
-void ConversorIEEE754::IEEtofloat2 (){
+float ConversorIEEE754::IEEtofloat2 (){
 
     union Code a;
 
     a.bitfield.partFrac = 4718592;
     a.bitfield.expo = 131;
     a.bitfield.sign = 0;
-    printf("El número es: %f \n", a.numero);
+    return a.numero;
 
 }
