@@ -9,11 +9,32 @@
  *
  */
 
-unsigned int ConversorIEEE754::floattoIEE (){
-
+unsigned int ConversorIEEE754::floattoIEENumex(float num)
+{
     union Code a;
-    return a.bitfield.partFrac;
+    a.numero = num;
+    return a.numerox;
+}
 
+unsigned int ConversorIEEE754::floattoIEESign(float num)
+{
+    union Code a;
+    a.numero = num;
+    return a.bitfield.sign;
+}
+
+unsigned int ConversorIEEE754::floattoIEEExp(float num)
+{
+    union Code a;
+    a.numero = num;
+    return a.bitfield.expo;
+}
+
+unsigned int ConversorIEEE754::floattoIEEMantisa(float num)
+{
+    union Code a;
+    a.numero = num;
+    return a.bitfield.partFrac;
 }
 
 unsigned int ConversorIEEE754::floattoIEE2 (){

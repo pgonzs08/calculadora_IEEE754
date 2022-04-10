@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "conversorieee754.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,6 +24,9 @@ private slots:
     void on_pushButton_3_clicked();
 
 private:
+
+    std::vector<unsigned int> potencias2;
+
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

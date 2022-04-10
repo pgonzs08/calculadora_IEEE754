@@ -39,7 +39,7 @@
       </widget>
      </item>
      <item row="2" column="3">
-      <widget class="QLineEdit" name="lineEdit"/>
+      <widget class="QLineEdit" name="opD2"/>
      </item>
      <item row="1" column="5">
       <widget class="Line" name="line_10">
@@ -49,7 +49,7 @@
       </widget>
      </item>
      <item row="6" column="3">
-      <widget class="QLineEdit" name="lineEdit_8">
+      <widget class="QLineEdit" name="opH2">
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -76,7 +76,7 @@
       </widget>
      </item>
      <item row="6" column="2">
-      <widget class="QLineEdit" name="lineEdit_7">
+      <widget class="QLineEdit" name="opH1">
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -90,7 +90,7 @@
       </widget>
      </item>
      <item row="4" column="3">
-      <widget class="QLineEdit" name="lineEdit_5">
+      <widget class="QLineEdit" name="opB2">
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -104,7 +104,7 @@
       </widget>
      </item>
      <item row="6" column="5">
-      <widget class="QLineEdit" name="lineEdit_9">
+      <widget class="QLineEdit" name="rH">
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -151,7 +151,7 @@
       </widget>
      </item>
      <item row="4" column="2">
-      <widget class="QLineEdit" name="lineEdit_4">
+      <widget class="QLineEdit" name="opB1">
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -191,7 +191,7 @@
       </widget>
      </item>
      <item row="2" column="5">
-      <widget class="QLineEdit" name="lineEdit_2">
+      <widget class="QLineEdit" name="rD">
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -239,10 +239,10 @@
       </widget>
      </item>
      <item row="2" column="2">
-      <widget class="QLineEdit" name="lineEdit_3"/>
+      <widget class="QLineEdit" name="opD1"/>
      </item>
      <item row="4" column="5">
-      <widget class="QLineEdit" name="lineEdit_6">
+      <widget class="QLineEdit" name="rB">
        <property name="readOnly">
         <bool>true</bool>
        </property>
