@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QLineEdit>
 #include "conversorieee754.h"
 
 QT_BEGIN_NAMESPACE
@@ -25,8 +26,10 @@ private slots:
 
 private:
 
-    std::vector<unsigned int> potencias2;
+    void binaryWriteIn(QLineEdit* child, unsigned int number);
 
     Ui::MainWindow *ui;
+
+    std::vector<unsigned int> bitPos;
 };
 #endif // MAINWINDOW_H
