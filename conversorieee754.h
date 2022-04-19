@@ -25,6 +25,7 @@ private:
 
         float numero;
         unsigned int numerox;
+
     };
 };
 

@@ -26,7 +26,7 @@ private slots:
 
 private:
 
-    void binaryWriteIn(QLineEdit* child, unsigned int number);
+    void binaryWriteIn(QLineEdit* child,  unsigned int sign, unsigned int exp, unsigned int mantisa);
 
     Ui::MainWindow *ui;
 

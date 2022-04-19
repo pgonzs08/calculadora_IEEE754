@@ -34,9 +34,6 @@ void MainWindow::on_pushButton_clicked()
 
     ui->rD->setText(QString::fromStdString(std::to_string(op1+op2)));
 
-    binaryWriteIn( ui->opB1, ConversorIEEE754::floattoIEENumex(op1));
-    binaryWriteIn( ui->opB2, ConversorIEEE754::floattoIEENumex(op2));
-
     //Pasos previos
 
     unsigned int signoA = ConversorIEEE754::floattoIEESign(op1);
@@ -47,6 +44,10 @@ void MainWindow::on_pushButton_clicked()
 
     unsigned int manA = ConversorIEEE754::floattoIEEMantisa(op1) +0b100000000000000000000000000;
     unsigned int manB = ConversorIEEE754::floattoIEEMantisa(op2) +0b100000000000000000000000000;
+
+
+    binaryWriteIn( ui->opB1, signoA, expA, manA);
+    binaryWriteIn( ui->opB2, signoB, expB, manB);
 
     //Paso 1
     std::cout << "Paso1: "<<std::endl;
@@ -177,9 +178,7 @@ void MainWindow::on_pushButton_clicked()
 
     ui->rD->setText(QString::fromStdString(std::to_string(salida)));
 
-    ui->rB->setText(QString::fromStdString(std::to_string(ConversorIEEE754::floattoIEENumex(salida))));
-
-
+    binaryWriteIn(ui->rB,signoSuma, expR, P-0b100000000000000000000000);
 
 }
 
@@ -193,14 +192,23 @@ void MainWindow::on_pushButton_3_clicked()
 
 }
 
-void MainWindow::binaryWriteIn(QLineEdit* child, unsigned int number)
+void MainWindow::binaryWriteIn(QLineEdit* child, unsigned int sign, unsigned int exp, unsigned int mantisa)
 {
     QString binaryNumber;
 
-    while(number >= 1){
+    binaryNumber.append(QString::fromStdString(std::to_string(sign)));
 
-        binaryNumber.append(QString::fromStdString(std::to_string(number%2)));
-        number /= 2;
+    while(exp >= 1){
+
+        binaryNumber.push_back(QString::fromStdString(std::to_string(exp%2)));
+        exp /= 2;
     }
+
+    while(mantisa >= 1){
+
+        binaryNumber.push_back(QString::fromStdString(std::to_string(mantisa%2)));
+        mantisa /= 2;
+    }
+
     child->setText(binaryNumber);
 }
