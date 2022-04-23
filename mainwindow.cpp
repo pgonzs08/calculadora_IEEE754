@@ -48,13 +48,12 @@ void MainWindow::on_pushButton_clicked()
     binaryWriteIn( ui->opB1, signoA, expA, manA);
     binaryWriteIn( ui->opB2, signoB, expB, manB);
 
+    const unsigned int excsBits = bitPos.at(31)+bitPos.at(30)+bitPos.at(29)+bitPos.at(28)+bitPos.at(27)+bitPos.at(26)+bitPos.at(25)+bitPos.at(24);
+    std::cout << "excsBits = " << excsBits << std::endl;
+
     //Paso 1
     std::cout << "Paso1: "<<std::endl;
     unsigned int signoSuma;
-
-    const unsigned int excsBits = bitPos.at(31)+bitPos.at(30)+bitPos.at(29)+bitPos.at(28)+bitPos.at(27)+bitPos.at(26)+bitPos.at(25)+bitPos.at(24);
-
-    std::cout << "excsBits = " << excsBits << std::endl;
 
     unsigned int g = 0; unsigned int r = 0; unsigned int st = 0;
     bool opChanged = false;
@@ -187,6 +186,81 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_pushButton_2_clicked()
 {
+
+    float op1 = ui->opD1->text().toFloat();
+    float op2 = ui->opD2->text().toFloat();
+
+    ui->rD->setText(QString::fromStdString(std::to_string(op1+op2)));
+
+    //Pasos previos
+
+    unsigned int signoA = ConversorIEEE754::floattoIEESign(op1);
+    unsigned int signoB = ConversorIEEE754::floattoIEESign(op2);
+
+    unsigned int expA = ConversorIEEE754::floattoIEEExp(op1);
+    unsigned int expB = ConversorIEEE754::floattoIEEExp(op2);
+
+    unsigned int manA = ConversorIEEE754::floattoIEEMantisa(op1) + bitPos.at(23);
+    unsigned int manB = ConversorIEEE754::floattoIEEMantisa(op2) + bitPos.at(23);
+
+
+    binaryWriteIn( ui->opB1, signoA, expA, manA);
+    binaryWriteIn( ui->opB2, signoB, expB, manB);
+
+    const unsigned int excsBits = bitPos.at(31)+bitPos.at(30)+bitPos.at(29)+bitPos.at(28)+bitPos.at(27)+bitPos.at(26)+bitPos.at(25)+bitPos.at(24);
+    std::cout << "excsBits = " << excsBits << std::endl;
+
+    //Paso 1:
+    std::cout << "Paso1:";
+    unsigned int signoR = signoA | signoB;
+    std::cout << "Signo = " << signoR << std::endl;
+    //Paso 2:
+    std::cout << "Paso2:";
+    unsigned int expR = expA + expB;
+    std::cout << "Exponente = " << expR-127 << std::endl;
+
+    //Paso 3:
+    std::cout << "Paso3:"<<std::endl;
+
+        //Paso 3i:
+        std::cout << "  Paso3i:";
+        unsigned long PA = manA*manB;
+        std::cout << "PA = " << PA;
+        unsigned int P = PA >> 24;
+        unsigned int A = PA-excsBits;
+        std::cout << " P = " << P << " A = "<< A<< std::endl;;
+
+        //Paso 3ii:
+        std::cout << "  Paso3ii:";
+
+        if((P & bitPos.at(23))==0){
+            P <<= 1;
+        }
+        else{
+            expR++;
+        }
+        std::cout << " P = " << P << " expR = " << expR << std::endl;
+
+        //Paso 3iii:
+        std::cout << "  Paso3iii:";
+        unsigned int r = (A & bitPos.at(23))!= 0;
+        std::cout << " r = " << r << std::endl;
+
+        //Paso 3iv:
+        std::cout << "  Paso3iv:";
+        unsigned int st = 0;
+        for(int i = 0; i < 23; i++) st |= (A & bitPos.at(i))!= 0;
+        std::cout << " st = " << st << std::endl;
+
+        //Paso 3v:
+        std::cout << "  Paso3v:";
+        if((r&&st) ||(r&&!st&&P%2)){
+            P = P+1;
+        }
+        std::cout << " P = " << P << std::endl;
+
+        //DESBORDAMIENTOS
+        if(expR>bitPos.at(7));
 
 }
 
