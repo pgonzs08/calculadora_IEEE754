@@ -10,14 +10,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    bitPos = {0b000000000000000000000001, 0b000000000000000000000010, 0b000000000000000000000100,
-              0b000000000000000000001000, 0b000000000000000000010000, 0b000000000000000000100000,
-              0b000000000000000001000000, 0b000000000000000010000000, 0b000000000000000100000000,
-              0b000000000000001000000000, 0b000000000000010000000000, 0b000000000000100000000000,
-              0b000000000001000000000000, 0b000000000010000000000000, 0b000000000100000000000000,
-              0b000000001000000000000000, 0b000000010000000000000000, 0b000000100000000000000000,
-              0b000001000000000000000000, 0b000010000000000000000000, 0b000100000000000000000000,
-              0b001000000000000000000000, 0b010000000000000000000000, 0b100000000000000000000000};
+    bitPos.push_back(1);
+
+    for(int i = 1; i < 32; i++) bitPos.push_back(2*bitPos.at(i-1));
+
+    std::cout << "bitPos values: ";
+    for(int i = 0; i < 32; i++) std::cout << " " << bitPos.at(i);
+    std::cout << std::endl; //bit de mantisa normalizada
 
 }
 
@@ -42,8 +41,8 @@ void MainWindow::on_pushButton_clicked()
     unsigned int expA = ConversorIEEE754::floattoIEEExp(op1);
     unsigned int expB = ConversorIEEE754::floattoIEEExp(op2);
 
-    unsigned int manA = ConversorIEEE754::floattoIEEMantisa(op1) +0b100000000000000000000000000;
-    unsigned int manB = ConversorIEEE754::floattoIEEMantisa(op2) +0b100000000000000000000000000;
+    unsigned int manA = ConversorIEEE754::floattoIEEMantisa(op1) + bitPos.at(23);
+    unsigned int manB = ConversorIEEE754::floattoIEEMantisa(op2) + bitPos.at(23);
 
 
     binaryWriteIn( ui->opB1, signoA, expA, manA);
@@ -53,24 +52,26 @@ void MainWindow::on_pushButton_clicked()
     std::cout << "Paso1: "<<std::endl;
     unsigned int signoSuma;
 
+    const unsigned int excsBits = bitPos.at(31)+bitPos.at(30)+bitPos.at(29)+bitPos.at(28)+bitPos.at(27)+bitPos.at(26)+bitPos.at(25)+bitPos.at(24);
+
+    std::cout << "excsBits = " << excsBits << std::endl;
+
     unsigned int g = 0; unsigned int r = 0; unsigned int st = 0;
-    unsigned int n = 24;
     bool opChanged = false;
     bool compP = false;
 
     //Paso 2
     std::cout << "Paso2: ";
-    if(expA<expB){
+    if(expA < expB){
         expA = ConversorIEEE754::floattoIEEExp(op2);
         expB = ConversorIEEE754::floattoIEEExp(op1);
-        manA = ConversorIEEE754::floattoIEEMantisa(op2) +0b100000000000000000000000;
-        manB = ConversorIEEE754::floattoIEEMantisa(op1) +0b100000000000000000000000;
+        manA = ConversorIEEE754::floattoIEEMantisa(op2) + bitPos.at(23);
+        manB = ConversorIEEE754::floattoIEEMantisa(op1) + bitPos.at(23);
         signoA = ConversorIEEE754::floattoIEESign(op2);
         signoB = ConversorIEEE754::floattoIEESign(op1);
         opChanged = true;
-
     }
-    std::cout <<" A= "<< signoA << expA << manA -0b100000000000000000000000 <<", B = "<< signoB << expB << manB -0b100000000000000000000000 << std::endl;
+    std::cout <<" A = "<< signoA << expA -127 << manA - bitPos.at(23) <<", B = "<< signoB << expB -127 << manB - bitPos.at(23) << std::endl;
     //Paso 3
     std::cout << "Paso3: ";
     unsigned int expR = expA;
@@ -80,9 +81,9 @@ void MainWindow::on_pushButton_clicked()
     //Paso 4
     std::cout << "Paso4: ";
     if(signoA!=signoB){
-        manB = (~manB)+1;
+        manB = (~manB)+1-excsBits;
     }
-    std::cout << manB<< std::endl;
+    std::cout <<"manB = "<<~(manB-1) - bitPos.at(23)-excsBits<<" ~manB = "<<manB -excsBits<< std::endl;
     //Paso 5
     std::cout << "Paso5: ";
     unsigned int P = manB;
@@ -99,20 +100,22 @@ void MainWindow::on_pushButton_clicked()
     //Paso 7
     std::cout << "Paso7: ";
     if(signoA!=signoB){
-        P >>= d;
-        P+= 0b100000000000000000000000;
+        for(unsigned int i = 0; i < d; i++){
+            P >>= 1;
+            P += bitPos.at(23);
+        }
     }
     else P = P>>d;
     std::cout << P<< std::endl;
     //Paso 8
     std::cout << "Paso8: " << " P = " << P << ", A = " << manA;
-    P = manA + P;
     unsigned int C = 0;
-    C = P > 0b111111111111111111111111;
+    C = (P & bitPos.at(23)) != 0 && (manA & bitPos.at(23)) != 0;
+    P = manA + P;
     std::cout << ", R = " << P << ", C = " << C << std::endl;
 
     //Paso 9
-    if(signoA!=signoB && P>= 0b100000000000000000000 && C == 0){
+    if(signoA!=signoB && (P & bitPos.at(23)) != 0 && C == 0){
         std::cout << "Paso9"<< std::endl;
         P = ~P+1;
         compP = true;
@@ -137,9 +140,9 @@ void MainWindow::on_pushButton_clicked()
 
         int k = 0;
 
-        for(unsigned int aux = P; aux < 0b100000000000000000000000; aux<<=1) k++;
+        for(unsigned int aux = P; aux!=0 && (aux & bitPos.at(23)) == 0 ; aux<<=1) k++;
 
-        if (k>0){
+        if (k == 0){
             st = r|st;
             r = g;
         }
@@ -149,11 +152,11 @@ void MainWindow::on_pushButton_clicked()
 
         for(int i = 0; i < k; i++) {
 
-            P<<=1;
-            P+=g;
+            P <<= 1;
+            P += g;
         }
 
-        expR-=k;
+        expR -= k;
 
     }
 
@@ -164,21 +167,21 @@ void MainWindow::on_pushButton_clicked()
         unsigned int C2 = P < aux;
 
         if(C2) {
-            P>>=1;
-            P+= 0b100000000000000000000000;
+            P >>= 1;
+            P += bitPos.at(23);
             expR++;
         }
     }
 
     //Paso 12:
 
-    signoSuma = (!opChanged && compP)? signoB:signoA;
+    signoSuma = (!opChanged && compP) ? signoB:signoA;
 
     float salida = ConversorIEEE754::IEEtofloat(signoSuma, expR, P);
 
     ui->rD->setText(QString::fromStdString(std::to_string(salida)));
 
-    binaryWriteIn(ui->rB,signoSuma, expR, P-0b100000000000000000000000);
+    binaryWriteIn(ui -> rB, signoSuma, expR, P - bitPos.at(23));
 
 }
 
@@ -198,16 +201,22 @@ void MainWindow::binaryWriteIn(QLineEdit* child, unsigned int sign, unsigned int
 
     binaryNumber.append(QString::fromStdString(std::to_string(sign)));
 
-    while(exp >= 1){
+    int it = 0;
+
+    while(it < 7){
 
         binaryNumber.push_back(QString::fromStdString(std::to_string(exp%2)));
         exp /= 2;
+        it++;
     }
 
-    while(mantisa >= 1){
+    it = 0;
+
+    while(it < 24){
 
         binaryNumber.push_back(QString::fromStdString(std::to_string(mantisa%2)));
-        mantisa /= 2;
+        mantisa >>= 1;
+        it++;
     }
 
     child->setText(binaryNumber);
