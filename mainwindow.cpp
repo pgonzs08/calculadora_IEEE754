@@ -216,7 +216,7 @@ void MainWindow::on_pushButton_2_clicked()
     std::cout << "Signo = " << signoR << std::endl;
     //Paso 2:
     std::cout << "Paso2:";
-    unsigned int expR = expA + expB;
+    unsigned int expR = expA + expB - 127;
     std::cout << "Exponente = " << expR-127 << std::endl;
 
     //Paso 3:
@@ -224,10 +224,10 @@ void MainWindow::on_pushButton_2_clicked()
 
         //Paso 3i:
         std::cout << "  Paso3i:";
-        unsigned long PA = manA*manB;
+        unsigned long PA = (long)manA*(long)manB;
         std::cout << "PA = " << PA;
         unsigned int P = PA >> 24;
-        unsigned int A = PA-excsBits;
+        unsigned int A = PA;
         std::cout << " P = " << P << " A = "<< A<< std::endl;;
 
         //Paso 3ii:
@@ -260,7 +260,20 @@ void MainWindow::on_pushButton_2_clicked()
         std::cout << " P = " << P << std::endl;
 
         //DESBORDAMIENTOS
-        if(expR>bitPos.at(7));
+        if(expR>0b11111111){
+
+            ui->rD->setText((signoR)? "-infinito":"infinito");
+            binaryWriteIn( ui->rB, signoA, expA, manA);
+
+        }
+        else if(expR<0);
+        else{
+        float salida = ConversorIEEE754::IEEtofloat(signoR, expR, P);
+
+        ui->rD->setText(QString::fromStdString(std::to_string(salida)));
+
+        binaryWriteIn( ui->rB, signoA, expA, manA);
+        }
 
 }
 
