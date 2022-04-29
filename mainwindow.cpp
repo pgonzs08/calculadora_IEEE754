@@ -47,6 +47,7 @@ void MainWindow::on_pushButton_clicked()
 
     binaryWriteIn( ui->opB1, signoA, expA, manA);
     binaryWriteIn( ui->opB2, signoB, expB, manB);
+    toHexUpdate();
 
     const unsigned int excsBits = bitPos.at(31)+bitPos.at(30)+bitPos.at(29)+bitPos.at(28)+bitPos.at(27)+bitPos.at(26)+bitPos.at(25)+bitPos.at(24);
     std::cout << "excsBits = " << excsBits << std::endl;
@@ -206,6 +207,7 @@ void MainWindow::on_pushButton_2_clicked()
 
     binaryWriteIn( ui->opB1, signoA, expA, manA);
     binaryWriteIn( ui->opB2, signoB, expB, manB);
+    toHexUpdate();
 
     const unsigned int excsBits = bitPos.at(31)+bitPos.at(30)+bitPos.at(29)+bitPos.at(28)+bitPos.at(27)+bitPos.at(26)+bitPos.at(25)+bitPos.at(24);
     std::cout << "excsBits = " << excsBits << std::endl;
@@ -286,25 +288,128 @@ void MainWindow::binaryWriteIn(QLineEdit* child, unsigned int sign, unsigned int
 {
     QString binaryNumber;
 
-    binaryNumber.append(QString::fromStdString(std::to_string(sign)));
 
-    int it = 0;
 
-    while(it < 7){
 
-        binaryNumber.push_back(QString::fromStdString(std::to_string(exp%2)));
+    for(int i =0;i< 23;i++){
+        binaryNumber.push_front(QString::fromStdString(std::to_string(mantisa%2)));
+        mantisa/=2;
+    }
+
+    for(int i=0;i<8;i++){
+        binaryNumber.push_front(QString::fromStdString(std::to_string(exp%2)));
         exp /= 2;
-        it++;
     }
 
-    it = 0;
+    binaryNumber.push_front(QString::fromStdString(std::to_string(sign)));
 
-    while(it < 24){
 
-        binaryNumber.push_back(QString::fromStdString(std::to_string(mantisa%2)));
-        mantisa >>= 1;
-        it++;
-    }
+    binaryNumber.push_front("0x");
 
     child->setText(binaryNumber);
 }
+
+
+
+void MainWindow::on_Reset_clicked()
+{
+    ui->opD1->setText("");
+    ui->opD2->setText("");
+    ui->opB1->setText("");
+    ui->opB2->setText("");
+    ui->opH1->setText("");
+    ui->opH2->setText("");
+    ui->rD->setText("");
+    ui->rB->setText("");
+    ui->rH->setText("");
+
+    op1=0;
+    op2=0;
+
+}
+
+void MainWindow::toHexUpdate(){
+    QString stringHex;
+    QString stringBin= ui->opB1->text();
+
+    for (int i=2 ; i<stringBin.length() ; i=i+4 ) {
+
+        QStringRef substringtemp(&stringBin,i,i+3);
+
+        if(substringtemp.at(0)=='0'){
+            if(substringtemp.at(1)=='0'){
+                if(substringtemp.at(2)=='0'){
+                    if(substringtemp.at(3)=='0'){
+                        stringHex.append('0');
+                    } else{
+                        stringHex.append('1');
+                    }
+                }else{
+                    if(substringtemp.at(3)=='0'){
+                        stringHex.append('2');
+                    } else{
+                        stringHex.append('3');
+                    }
+
+                }
+            }else{
+                if(substringtemp.at(2)=='0'){
+                    if(substringtemp.at(3)=='0'){
+                        stringHex.append('4');
+                    } else{
+                        stringHex.append('5');
+                    }
+                }else{
+                    if(substringtemp.at(3)=='0'){
+                        stringHex.append('6');
+                    } else{
+                        stringHex.append('7');
+                    }
+                }
+            }
+        }else{
+            if(substringtemp.at(1)=='0'){
+                if(substringtemp.at(2)=='0'){
+                    if(substringtemp.at(3)=='0'){
+                        stringHex.append('8');
+                    } else{
+                        stringHex.append('9');
+                    }
+                }else{
+                    if(substringtemp.at(3)=='0'){
+                        stringHex.append('A');
+                    } else{
+                        stringHex.append('B');
+                    }
+
+                }
+            }else{
+                if(substringtemp.at(2)=='0'){
+                    if(substringtemp.at(3)=='0'){
+                        stringHex.append('C');
+                    } else{
+                        stringHex.append('D');
+                    }
+                }else{
+                    if(substringtemp.at(3)=='0'){
+                        stringHex.append('E');
+                    } else{
+                        stringHex.append('F');
+                    }
+
+                }
+
+            }
+
+        }
+
+
+
+    }
+
+
+    ui->opH1->setText("0x"+stringHex);
+
+
+}
+
