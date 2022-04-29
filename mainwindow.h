@@ -23,8 +23,14 @@ private slots:
     void on_pushButton_2_clicked();
 
     void on_pushButton_3_clicked();
+    
+    void on_Reset_clicked();
 
 private:
+
+    void binaryWriteIn(QLineEdit* child,  unsigned int sign, unsigned int exp, unsigned int mantisa);
+    bool isDenormal(QString text);
+    void toHexUpdate();
 
     void binaryWriteIn(QLineEdit* child,  unsigned int sign, unsigned int exp, unsigned int mantisa);
 
