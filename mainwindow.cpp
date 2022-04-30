@@ -143,14 +143,7 @@ void MainWindow::on_pushButton_clicked()
 
         int k = 0;
         std::cout << "Paso10b: P = "<< P;
-        while((P & bitPos.at(23)) == 0){
-
-            k++;
-
-            P<<=1;
-            P += g;
-
-        }
+        for(unsigned int aux = P; aux != 0 && (aux & bitPos.at(23)) == 0; aux <<=1) k++;
         std::cout << " k = " << k<< std::endl;
         if (k == 0){
             st = r|st;
@@ -158,6 +151,13 @@ void MainWindow::on_pushButton_clicked()
         }
         else{
             st = 0; r = 0;
+        }
+
+        for(int i = 0; i < k; i++){
+
+            P<<=1;
+            P += g;
+
         }
 
         expR -= k;
@@ -316,7 +316,7 @@ void MainWindow::binaryWriteIn(QLineEdit* child, unsigned int sign, unsigned int
 unsigned int MainWindow::calcularAcarreo(unsigned int manA, unsigned int manB, unsigned int pos, unsigned int acarreoActual)
 {
 
-    if(pos == 23) return acarreoActual;
+    if(pos == 24) return acarreoActual;
 
     if((manB & bitPos.at(pos)) != 0 && (manA & bitPos.at(pos)) != 0) return calcularAcarreo(manA, manB, pos+1, 1);
     else if(((manB & bitPos.at(pos)) != 0 || (manA & bitPos.at(pos)) != 0) && acarreoActual != 0) return calcularAcarreo(manA, manB, pos+1, 1);
