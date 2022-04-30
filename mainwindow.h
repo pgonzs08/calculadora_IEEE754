@@ -29,10 +29,12 @@ private slots:
 private:
 
     void binaryWriteIn(QLineEdit* child,  unsigned int sign, unsigned int exp, unsigned int mantisa);
-    bool isDenormal(QString text);
-    void toHexUpdate();
 
-    void binaryWriteIn(QLineEdit* child,  unsigned int sign, unsigned int exp, unsigned int mantisa);
+    unsigned int calcularAcarreo(unsigned int manA, unsigned int manB, unsigned int pos, unsigned int acarreoActual);
+
+    bool isDenormal(QString text);
+
+    void hexWriteIn(QLineEdit* child,  unsigned int sign, unsigned int exp, unsigned int mantisa);
 
     Ui::MainWindow *ui;
 
