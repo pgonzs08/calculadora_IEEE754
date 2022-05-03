@@ -288,7 +288,78 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_pushButton_3_clicked()
 {
+        op1 = ui->opD1->text().toFloat();
+    op2 = ui->opD2->text().toFloat();
 
+    ui->rD->setText(QString::fromStdString(std::to_string(op1/op2)));
+
+    //Pasos previos
+
+    unsigned int signoA = ConversorIEEE754::floattoIEESign(op1);
+    unsigned int signoB = ConversorIEEE754::floattoIEESign(op2);
+
+    unsigned int expA = ConversorIEEE754::floattoIEEExp(op1);
+    unsigned int expB = ConversorIEEE754::floattoIEEExp(op2);
+
+    unsigned int manA = ConversorIEEE754::floattoIEEMantisa(op1) + bitPos.at(23);
+    unsigned int manB = ConversorIEEE754::floattoIEEMantisa(op2) + bitPos.at(23);
+
+
+    binaryWriteIn( ui->opB1, signoA, expA, manA);
+    binaryWriteIn( ui->opB2, signoB, expB, manB);
+
+
+    // 1.-Escalamos a [1,2)
+
+
+    int escA =ConversorIEEE754::IEEtofloat(0,0,manA);
+    int escB =ConversorIEEE754::IEEtofloat(0,0,manB);
+
+
+    //2.-Aproximamos b'=1/b
+
+    int inversoB;
+    if(escB<1.25)
+    {
+        inversoB=1;
+    }else inversoB=0.8;
+
+
+    //3.- Asignamos x e y sub cero
+    int x=escA*inversoB;
+    int y=escB*inversoB;
+    //4.-Iteramos hasta tener la precision correcta
+    int lastx;
+    do{
+        int r=2-y;
+        y*=r;
+        lastx=x;
+        x*=r;
+    }while((x-lastx)<=0.001);
+
+    //Ahora mismo x es a*1/b
+    unsigned int signoX = ConversorIEEE754::floattoIEESign(x);
+
+    unsigned int expX = ConversorIEEE754::floattoIEEExp(x);
+
+    unsigned int manX = ConversorIEEE754::floattoIEEMantisa(x) + bitPos.at(23);
+
+
+    //5.-Signo
+
+    unsigned int signoDiv;
+    if(signoA==signoB){
+        signoDiv=0;
+    }else signoDiv=1;
+
+    //6.-Exponente
+
+    int exponenteDiv;
+    exponenteDiv=expA-expB+expX;
+
+    //7.- Final
+
+    binaryWriteIn(ui->rD,signoDiv,exponenteDiv,manX);
 }
 
 void MainWindow::binaryWriteIn(QLineEdit* child, unsigned int sign, unsigned int exp, unsigned int mantisa)
