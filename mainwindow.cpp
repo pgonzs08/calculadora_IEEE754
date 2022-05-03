@@ -303,7 +303,7 @@ void MainWindow::on_pushButton_3_clicked()
         y*=r;
         lastx=x;
         x*=r;
-    }while((x-lastx)<=0.001);
+    }while((x-lastx)>=0.0001);
 
     //Ahora mismo x es a*1/b
     unsigned int signoX = ConversorIEEE754::floattoIEESign(x);
