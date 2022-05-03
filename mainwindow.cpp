@@ -420,17 +420,7 @@ void MainWindow::hexWriteIn(QLineEdit* child, unsigned int sign, unsigned int ex
 
     QString stringHex;
 
-    unsigned int aux = sign;
-
-    for(int i = 7; i >=0; i-- ) {
-        aux <<= 1;
-        aux += ((exp & bitPos.at(i)) != 0)? 1: 0;
-    }
-
-    for(int i = 22; i >= 0; i--){
-        aux <<= 1;
-        aux += ((mantisa & bitPos.at(i)) != 0)? 1: 0;
-    }
+    unsigned int aux = (sign << 31) + (exp << 23) + (mantisa-0b100000000000000000000000);
 
     for(int i = 0; i < 8; i++) {
 
