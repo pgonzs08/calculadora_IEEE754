@@ -51,10 +51,8 @@ void MainWindow::on_pushButton_clicked()
     hexWriteIn(ui->opH2, signoB, expB, manB);
 
     const unsigned int excsBits = bitPos.at(31)+bitPos.at(30)+bitPos.at(29)+bitPos.at(28)+bitPos.at(27)+bitPos.at(26)+bitPos.at(25)+bitPos.at(24);
-    std::cout << "excsBits = " << excsBits << std::endl;
 
     //Paso 1
-    std::cout << "Paso1: "<<std::endl;
     unsigned int signoSuma;
 
     unsigned int g = 0; unsigned int r = 0; unsigned int st = 0;
@@ -62,7 +60,6 @@ void MainWindow::on_pushButton_clicked()
     bool compP = false;
 
     //Paso 2
-    std::cout << "Paso2: ";
     if(expA < expB){
         expA = ConversorIEEE754::floattoIEEExp(op2);
         expB = ConversorIEEE754::floattoIEEExp(op1);
@@ -72,36 +69,26 @@ void MainWindow::on_pushButton_clicked()
         signoB = ConversorIEEE754::floattoIEESign(op1);
         opChanged = true;
     }
-    std::cout <<" A = "<< signoA << expA -127 << manA - bitPos.at(23) <<", B = "<< signoB << expB -127 << manB - bitPos.at(23) << std::endl;
     //Paso 3
-    std::cout << "Paso3: ";
     unsigned int expR = expA;
     unsigned int d = expA - expB;
     d = (d>=0)? d:-d;
-    std::cout << d<< std::endl;
     //Paso 4
 
     if(signoA!=signoB){
-        std::cout << "Paso4: ";
         manB = (~manB)+1-excsBits;
-        std::cout <<"manB = "<<~(manB-1) - bitPos.at(23)-excsBits<<" ~manB = "<<manB -excsBits<< std::endl;
     }
 
     //Paso 5
-    std::cout << "Paso5: ";
     unsigned int P = manB;
-    std::cout << P<< std::endl;
     //Paso 6
-    std::cout << "Paso6: ";
     if(d>=3){
         g = (bitPos.at(d-1)&P)!=0;
         r = (bitPos.at(d-2)&P)!=0;
         st = (bitPos.at(d-3)&P)!=0;
     }
     for(int i = d-3; i > 0 && !st; i--) st = st|(bitPos.at(d-i)&P);
-    std::cout <<"g = "<< g <<", r = "<<r<<", st = "<<st<< std::endl;
     //Paso 7
-    std::cout << "Paso7: ";
     if(signoA!=signoB){
         for(unsigned int i = 0; i < d; i++){
             P >>= 1;
@@ -109,17 +96,13 @@ void MainWindow::on_pushButton_clicked()
         }
     }
     else P = P>>d;
-    std::cout << P<< std::endl;
     //Paso 8
-    std::cout << "Paso8: " << " P = " << P << ", A = " << manA;
     unsigned int C = 0;
     C = calcularAcarreo(manA, P, 0, 0);
     P = manA + P;
-    std::cout << ", R = " << P << ", C = " << C << std::endl;
 
     //Paso 9
     if(signoA!=signoB && (P & bitPos.at(23)) != 0 && C == 0){
-        std::cout << "Paso9"<< std::endl;
         P = ~P+1;
         compP = true;
     }
@@ -128,8 +111,6 @@ void MainWindow::on_pushButton_clicked()
     if(signoA == signoB && C==1){
 
         st = g | r | st;
-
-        std::cout << "Paso10a"<< std::endl;
 
         r = P%2;
 
@@ -142,9 +123,7 @@ void MainWindow::on_pushButton_clicked()
     else{
 
         int k = 0;
-        std::cout << "Paso10b: P = "<< P;
         for(unsigned int aux = P; aux != 0 && (aux & bitPos.at(23)) == 0; aux <<=1) k++;
-        std::cout << " k = " << k<< std::endl;
         if (k == 0){
             st = r|st;
             r = g;
@@ -215,23 +194,13 @@ void MainWindow::on_pushButton_2_clicked()
     hexWriteIn(ui->opH1, signoA, expA, manA);
     hexWriteIn(ui->opH2, signoB, expB, manB);
 
-    const unsigned int excsBits = bitPos.at(31)+bitPos.at(30)+bitPos.at(29)+bitPos.at(28)+bitPos.at(27)+bitPos.at(26)+bitPos.at(25)+bitPos.at(24);
-    std::cout << "excsBits = " << excsBits << std::endl;
-
     //Paso 1:
-    std::cout << "Paso1:";
     unsigned int signoR = signoA ^ signoB;
-    std::cout << "Signo = " << signoR << std::endl;
     //Paso 2:
-    std::cout << "Paso2:";
     unsigned int expR = expA + expB - 127;
-    std::cout << "Exponente = " << expR-127 << std::endl;
 
     //Paso 3:
-    std::cout << "Paso3:"<<std::endl;
-
     //Paso 3i:
-    std::cout << "  Paso3i:";
     unsigned int c = 0;
     unsigned int P = 0;
     unsigned int A = manA;
@@ -243,10 +212,7 @@ void MainWindow::on_pushButton_2_clicked()
             c>>=1;
     }
 
-    std::cout << " P = " << P << " A = "<< A<< std::endl;;
-
     //Paso 3ii:
-    std::cout << "  Paso3ii:";
 
     if((P & bitPos.at(23))==0){
         P <<= 1;
@@ -254,25 +220,19 @@ void MainWindow::on_pushButton_2_clicked()
     else{
         expR++;
     }
-    std::cout << " P = " << P << " expR = " << expR << std::endl;
 
     //Paso 3iii:
-    std::cout << "  Paso3iii:";
     unsigned int r = (A & bitPos.at(23))!= 0;
-    std::cout << " r = " << r << std::endl;
 
     //Paso 3iv:
-    std::cout << "  Paso3iv:";
     unsigned int st = 0;
     for(int i = 0; i < 23; i++) st |= (A & bitPos.at(i))!= 0;
     std::cout << " st = " << st << std::endl;
 
     //Paso 3v:
-    std::cout << "  Paso3v:";
     if((r&&st) ||(r&&!st&&P%2)){
         P = P+1;
     }
-    std::cout << " P = " << P << std::endl;
 
     //DESBORDAMIENTOS
     if(expR>0b11111111){
