@@ -220,7 +220,7 @@ void MainWindow::on_pushButton_2_clicked()
 
     //Paso 1:
     std::cout << "Paso1:";
-    unsigned int signoR = signoA | signoB;
+    unsigned int signoR = signoA ^ signoB;
     std::cout << "Signo = " << signoR << std::endl;
     //Paso 2:
     std::cout << "Paso2:";
@@ -288,8 +288,8 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    op1 = ui->opD1->text().toFloat();
-    op2 = ui->opD2->text().toFloat();
+    float op1 = ui->opD1->text().toFloat();
+    float op2 = ui->opD2->text().toFloat();
 
     ui->rD->setText(QString::number(op1/op2));
 
