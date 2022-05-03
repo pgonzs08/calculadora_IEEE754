@@ -360,7 +360,10 @@ void MainWindow::on_pushButton_3_clicked()
 
     //7.- Final
 
-    binaryWriteIn(ui->rB,signoDiv,exponenteDiv,manX);
+ 
+       binaryWriteIn(ui->rB,signoDiv,exponenteDiv,manX);
+    hexWriteIn(ui->rH,signoDiv,exponenteDiv,manX);
+    ui->rD->setText(QString::number(ConversorIEEE754::IEEtofloat(signoDiv,exponenteDiv,manX)));
 }
 
 void MainWindow::binaryWriteIn(QLineEdit* child, unsigned int sign, unsigned int exp, unsigned int mantisa)
