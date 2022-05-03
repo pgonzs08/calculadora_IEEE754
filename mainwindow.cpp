@@ -232,7 +232,10 @@ void MainWindow::on_pushButton_2_clicked()
 
     //Paso 3i:
     std::cout << "  Paso3i:";
-    unsigned long PA = (long)manA*(long)manB;
+    unsigned long auxA = manA;
+    unsigned long auxB = manB;
+    unsigned long PA = auxA*auxB;
+
     std::cout << "PA = " << PA;
     unsigned int P = PA >> 24;
     unsigned int A = PA;
