@@ -206,10 +206,10 @@ void MainWindow::on_pushButton_2_clicked()
     unsigned int A = manA;
 
     for(int i = 0; i < 24; i++){
-            P+=A%2*manB;
-            A = (A>>1) + (P%2)*bitPos.at(23);
-            P = (P>>1) + c*bitPos.at(23);
-            c>>=1;
+        P+=A%2*manB;
+        A = (A>>1) + (P%2)*bitPos.at(23);
+        P = (P>>1) + c*bitPos.at(23);
+        c>>=1;
     }
 
     //Paso 3ii:
@@ -227,7 +227,6 @@ void MainWindow::on_pushButton_2_clicked()
     //Paso 3iv:
     unsigned int st = 0;
     for(int i = 0; i < 23; i++) st |= (A & bitPos.at(i))!= 0;
-    std::cout << " st = " << st << std::endl;
 
     //Paso 3v:
     if((r&&st) ||(r&&!st&&P%2)){
@@ -241,15 +240,18 @@ void MainWindow::on_pushButton_2_clicked()
         binaryWriteIn( ui->rB, signoA, expA, manA);
 
     }
-    else if(expR<0);
-    else{
-        float salida = ConversorIEEE754::IEEtofloat(signoR, expR, P);
-
-        ui->rD->setText(QString::fromStdString(std::to_string(salida)));
-
-        binaryWriteIn( ui->rB, ConversorIEEE754::floattoIEESign(salida), ConversorIEEE754::floattoIEEExp(salida), ConversorIEEE754::floattoIEEMantisa(salida));
-        hexWriteIn(ui->rH, ConversorIEEE754::floattoIEESign(salida), ConversorIEEE754::floattoIEEExp(salida), ConversorIEEE754::floattoIEEMantisa(salida));
+    else if(expR<0){
+        unsigned int t = (0 - expR >= 0)? (0 - expR):(expR-0);
+        P >>= t;
+        expR = 0;
     }
+
+    float salida = ConversorIEEE754::IEEtofloat(signoR, expR, P);
+
+    ui->rD->setText(QString::fromStdString(std::to_string(salida)));
+
+    binaryWriteIn( ui->rB, ConversorIEEE754::floattoIEESign(salida), ConversorIEEE754::floattoIEEExp(salida), ConversorIEEE754::floattoIEEMantisa(salida));
+    hexWriteIn(ui->rH, ConversorIEEE754::floattoIEESign(salida), ConversorIEEE754::floattoIEEExp(salida), ConversorIEEE754::floattoIEEMantisa(salida));
 
 }
 
@@ -327,8 +329,8 @@ void MainWindow::on_pushButton_3_clicked()
 
     //7.- Final
 
- 
-       binaryWriteIn(ui->rB,signoDiv,exponenteDiv,manX);
+
+    binaryWriteIn(ui->rB,signoDiv,exponenteDiv,manX);
     hexWriteIn(ui->rH,signoDiv,exponenteDiv,manX);
     ui->rD->setText(QString::number(ConversorIEEE754::IEEtofloat(signoDiv,exponenteDiv,manX)));
 }
