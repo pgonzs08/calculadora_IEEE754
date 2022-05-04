@@ -46,10 +46,8 @@ void MainWindow::on_pushButton_clicked()
 
     binaryWriteIn( ui->opB1, signoA, expA, manA);
     binaryWriteIn( ui->opB2, signoB, expB, manB);
-    hexWriteIn(ui->opH1, signoA, expA, manA);
-    hexWriteIn(ui->opH2, signoB, expB, manB);
-
-    const unsigned int excsBits = bitPos.at(31)+bitPos.at(30)+bitPos.at(29)+bitPos.at(28)+bitPos.at(27)+bitPos.at(26)+bitPos.at(25)+bitPos.at(24);
+    hexWriteIn(ui->opH1, signoA, expA, manA-bitPos.at(23));
+    hexWriteIn(ui->opH2, signoB, expB, manB-bitPos.at(23));
 
     //Paso 1
     unsigned int signoSuma;
@@ -191,8 +189,8 @@ void MainWindow::on_pushButton_2_clicked()
 
     binaryWriteIn( ui->opB1, signoA, expA, manA);
     binaryWriteIn( ui->opB2, signoB, expB, manB);
-    hexWriteIn(ui->opH1, signoA, expA, manA);
-    hexWriteIn(ui->opH2, signoB, expB, manB);
+    hexWriteIn(ui->opH1, signoA, expA, manA-bitPos.at(23));
+    hexWriteIn(ui->opH2, signoB, expB, manB-bitPos.at(23));
 
     //Paso 1:
     unsigned int signoR = signoA ^ signoB;
@@ -241,7 +239,7 @@ void MainWindow::on_pushButton_2_clicked()
 
     }
     else if(expR<0){
-        unsigned int t = (0 - expR >= 0)? (0 - expR):(expR-0);
+        unsigned int t = (1 - expR >= 0)? (1 - expR):(expR-0);
         P >>= t;
         expR = 0;
     }
@@ -250,8 +248,8 @@ void MainWindow::on_pushButton_2_clicked()
 
     ui->rD->setText(QString::fromStdString(std::to_string(salida)));
 
-    binaryWriteIn( ui->rB, ConversorIEEE754::floattoIEESign(salida), ConversorIEEE754::floattoIEEExp(salida), ConversorIEEE754::floattoIEEMantisa(salida));
-    hexWriteIn(ui->rH, ConversorIEEE754::floattoIEESign(salida), ConversorIEEE754::floattoIEEExp(salida), ConversorIEEE754::floattoIEEMantisa(salida));
+    binaryWriteIn( ui->rB, signoR, expR, P);
+    hexWriteIn(ui->rH, signoR, expR, P-bitPos.at(23));
 
 }
 
@@ -274,8 +272,8 @@ void MainWindow::on_pushButton_3_clicked()
     unsigned int manB = ConversorIEEE754::floattoIEEMantisa(op2) + bitPos.at(23);
 
 
-    binaryWriteIn( ui->opB1, signoA, expA, manA);
-    binaryWriteIn( ui->opB2, signoB, expB, manB);
+    binaryWriteIn( ui->opB1, signoA, expA, manA-bitPos.at(23));
+    binaryWriteIn( ui->opB2, signoB, expB, manB-bitPos.at(23));
 
 
     // 1.-Escalamos a [1,2)
@@ -386,7 +384,7 @@ void MainWindow::hexWriteIn(QLineEdit* child, unsigned int sign, unsigned int ex
 
     QString stringHex;
 
-    unsigned int aux = (sign << 31) + (exp << 23) + (mantisa-0b100000000000000000000000);
+    unsigned int aux = (sign << 31) + (exp << 23) + (mantisa);
 
     for(int i = 0; i < 8; i++) {
 
