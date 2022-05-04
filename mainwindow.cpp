@@ -14,9 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     for(int i = 1; i < 32; i++) bitPos.push_back(2*bitPos.at(i-1));
 
-    std::cout << "bitPos values: ";
     for(int i = 0; i < 32; i++) std::cout << " " << bitPos.at(i);
-    std::cout << std::endl; //bit de mantisa normalizada
+
 
 }
 
@@ -71,21 +70,20 @@ void MainWindow::on_pushButton_clicked()
     }
     //Paso 3
     unsigned int expR = expA;
-    unsigned int d = expA - expB;
-    d = (d>=0)? d:-d;
+    unsigned int d = (expA - expB >= 0)? (expA - expB):(expB - expA);
     //Paso 4
 
     if(signoA!=signoB){
-        manB = (~manB)+1-excsBits;
+        manB = (~manB)+1;
     }
 
     //Paso 5
     unsigned int P = manB;
     //Paso 6
-    if(d>=3){
-        g = (bitPos.at(d-1)&P)!=0;
-        r = (bitPos.at(d-2)&P)!=0;
-        st = (bitPos.at(d-3)&P)!=0;
+    if(d>=3 && d < 24){
+        g = ((bitPos.at(d-1)&P)!=0)? 1:0;
+        r = ((bitPos.at(d-2)&P)!=0)? 1:0;
+        st = ((bitPos.at(d-3)&P)!=0)? 1:0;
     }
     for(int i = d-3; i > 0 && !st; i--) st = st|(bitPos.at(d-i)&P);
     //Paso 7
@@ -162,10 +160,12 @@ void MainWindow::on_pushButton_clicked()
 
     float salida = ConversorIEEE754::IEEtofloat(signoSuma, expR, P);
 
+    if((expA == 0 && manA-bitPos.at(23) == 0) || (expB == 0 && manB-bitPos.at(23) == 0)) salida = (expA == 0 && manA == 0)? ConversorIEEE754::IEEtofloat(signoB, expB, manB):ConversorIEEE754::IEEtofloat(signoA, expA, manA);
+
     ui->rD->setText(QString::fromStdString(std::to_string(salida)));
 
-    binaryWriteIn(ui -> rB, signoSuma, expR, P - bitPos.at(23));
-    hexWriteIn(ui->rH, signoSuma, expR, P);
+    binaryWriteIn(ui -> rB, ConversorIEEE754::floattoIEESign(salida), ConversorIEEE754::floattoIEEExp(salida), ConversorIEEE754::floattoIEEMantisa(salida));
+    hexWriteIn(ui->rH, ConversorIEEE754::floattoIEESign(salida), ConversorIEEE754::floattoIEEExp(salida), ConversorIEEE754::floattoIEEMantisa(salida));
 
 }
 
@@ -197,7 +197,7 @@ void MainWindow::on_pushButton_2_clicked()
     //Paso 1:
     unsigned int signoR = signoA ^ signoB;
     //Paso 2:
-    unsigned int expR = expA + expB - 127;
+    int expR = expA + expB - 127;
 
     //Paso 3:
     //Paso 3i:
@@ -247,8 +247,8 @@ void MainWindow::on_pushButton_2_clicked()
 
         ui->rD->setText(QString::fromStdString(std::to_string(salida)));
 
-        binaryWriteIn( ui->rB, signoR, expR, P);
-        hexWriteIn(ui->rH, signoR, expR, P);
+        binaryWriteIn( ui->rB, ConversorIEEE754::floattoIEESign(salida), ConversorIEEE754::floattoIEEExp(salida), ConversorIEEE754::floattoIEEMantisa(salida));
+        hexWriteIn(ui->rH, ConversorIEEE754::floattoIEESign(salida), ConversorIEEE754::floattoIEEExp(salida), ConversorIEEE754::floattoIEEMantisa(salida));
     }
 
 }
