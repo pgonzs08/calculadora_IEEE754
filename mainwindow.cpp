@@ -340,7 +340,7 @@ float MainWindow::aluMultiply(float op1, float op2){
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    float op1 = ui->opD1->text().toFloat();
+float op1 = ui->opD1->text().toFloat();
     float op2 = ui->opD2->text().toFloat();
 
 
@@ -382,19 +382,19 @@ void MainWindow::on_pushButton_3_clicked()
 
         return;
     }
-    //Arreglo para los denormales exponente -127 pasa a ser -126
+//    //Arreglo para los denormales exponente -127 pasa a ser -126
 
-    if(expA==0){
+//    if(expA==0){
 
-        expA=1;
+//        expA=1;
 
-    }
+//    }
 
-    if(expB==0){
+//    if(expB==0){
 
-        expB=1;
+//        expB=1;
 
-    }
+//    }
 
 
 
@@ -456,14 +456,42 @@ void MainWindow::on_pushButton_3_clicked()
     //6.-Exponente
 
     int exponenteDiv;
-    exponenteDiv=expA-expB+expX;
 
+    exponenteDiv=expA-expB+expX;
+    if(exponenteDiv>=255){
+        exponenteDiv=255;
+    }
+    if(expA==255||expB==255){
+        ui->rB->setText("NaN");
+        ui->rD->setText("NaN");
+        ui->rH->setText("NaN");
+        return;
+    }
     //7.- Final
 
 
     binaryWriteIn(ui->rB,signoDiv,exponenteDiv,manX);
     hexWriteIn(ui->rH,signoDiv,exponenteDiv,manX);
-    ui->rD->setText(QString::number(ConversorIEEE754::IEEtofloat(signoDiv,exponenteDiv,manX)));
+
+
+    if(exponenteDiv!=0){
+        ui->rD->setText(QString::number(ConversorIEEE754::IEEtofloat(signoDiv,exponenteDiv,manX)));
+    }else{
+        ui->rD->setText(QString::number(MainWindow::denormalCalculator(signoDiv,manX)));
+    }
+}
+
+
+
+
+
+float MainWindow::denormalCalculator(unsigned int sign, unsigned int mantissa){
+    float preMantissa =1-ConversorIEEE754::IEEtofloat(0,127,mantissa);
+    if(sign){
+        return mantissa * 1.1754944e-38;//2^-126 para la alu
+    }else{
+        return mantissa * -1.1754944e-38;//-2^-126 para la alu
+    }
 }
 
 void MainWindow::binaryWriteIn(QLineEdit* child, unsigned int sign, unsigned int exp, unsigned int mantisa)
