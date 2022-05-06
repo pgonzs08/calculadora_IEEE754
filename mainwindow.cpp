@@ -162,6 +162,8 @@ float MainWindow::aluAdd(float op1, float op2){
 
     signoSuma = (!opChanged && compP) ? signoB:signoA;
 
+    if(expR > 255) return (signoSuma)? -Q_INFINITY:Q_INFINITY;
+
     return ConversorIEEE754::IEEtofloat(signoSuma, expR, P);
 
 }
