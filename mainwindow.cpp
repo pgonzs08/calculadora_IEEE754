@@ -253,6 +253,91 @@ void MainWindow::on_pushButton_2_clicked()
 
 }
 
+
+float MainWindow::aluMultiply(float op1, float op2){
+
+    unsigned int signoA = ConversorIEEE754::floattoIEESign(op1);
+    unsigned int signoB = ConversorIEEE754::floattoIEESign(op2);
+
+    unsigned int expA = ConversorIEEE754::floattoIEEExp(op1);
+    unsigned int expB = ConversorIEEE754::floattoIEEExp(op2);
+
+    unsigned int manA = ConversorIEEE754::floattoIEEMantisa(op1) + bitPos.at(23);
+    unsigned int manB = ConversorIEEE754::floattoIEEMantisa(op2) + bitPos.at(23);
+
+    const unsigned int excsBits = bitPos.at(31)+bitPos.at(30)+bitPos.at(29)+bitPos.at(28)+bitPos.at(27)+bitPos.at(26)+bitPos.at(25)+bitPos.at(24);
+    std::cout << "excsBits = " << excsBits << std::endl;
+
+    //Paso 1:
+    std::cout << "Paso1:";
+    unsigned int signoR = signoA ^ signoB;
+    std::cout << "Signo = " << signoR << std::endl;
+    //Paso 2:
+    std::cout << "Paso2:";
+    unsigned int expR = expA + expB - 127;
+    std::cout << "Exponente = " << expR-127 << std::endl;
+
+    //Paso 3:
+    std::cout << "Paso3:"<<std::endl;
+
+    //Paso 3i:
+    std::cout << "  Paso3i:";
+    unsigned int c = 0;
+    unsigned int P = 0;
+    unsigned int A = manA;
+
+    for(int i = 0; i < 24; i++){
+            P+=A%2*manB;
+            A = (A>>1) + (P%2)*bitPos.at(23);
+            P = (P>>1) + c*bitPos.at(23);
+            c>>=1;
+    }
+
+    std::cout << " P = " << P << " A = "<< A<< std::endl;;
+
+    //Paso 3ii:
+    std::cout << "  Paso3ii:";
+
+    if((P & bitPos.at(23))==0){
+        P <<= 1;
+    }
+    else{
+        expR++;
+    }
+    std::cout << " P = " << P << " expR = " << expR << std::endl;
+
+    //Paso 3iii:
+    std::cout << "  Paso3iii:";
+    unsigned int r = (A & bitPos.at(23))!= 0;
+    std::cout << " r = " << r << std::endl;
+
+    //Paso 3iv:
+    std::cout << "  Paso3iv:";
+    unsigned int st = 0;
+    for(int i = 0; i < 23; i++) st |= (A & bitPos.at(i))!= 0;
+    std::cout << " st = " << st << std::endl;
+
+    //Paso 3v:
+    std::cout << "  Paso3v:";
+    if((r&&st) ||(r&&!st&&P%2)){
+        P = P+1;
+    }
+    std::cout << " P = " << P << std::endl;
+
+    //DESBORDAMIENTOS
+    if(expR>0b11111111){
+        return Q_INFINITY;
+    }
+    else if(expR<0);
+    else{
+        float salida = ConversorIEEE754::IEEtofloat(signoR, expR, P);
+        return salida;
+    }
+
+
+
+}
+
 void MainWindow::on_pushButton_3_clicked()
 {
     float op1 = ui->opD1->text().toFloat();
