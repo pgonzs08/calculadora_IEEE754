@@ -74,7 +74,7 @@ float MainWindow::aluAdd(float op1, float op2){
         opChanged = true;
     }
     //Paso 3
-    unsigned int expR = expA;
+    int expR = expA;
     unsigned int d = expA - expB;
     //Paso 4
 
