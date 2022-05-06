@@ -491,9 +491,6 @@ void MainWindow::on_pushButton_3_clicked()
     float op1 = ui->opD1->text().toFloat();
     float op2 = ui->opD2->text().toFloat();
 
-
-
-
     //Pasos previos
 
     unsigned int signoA = ConversorIEEE754::floattoIEESign(op1);
@@ -544,19 +541,23 @@ void MainWindow::on_pushButton_3_clicked()
     //Casos de "infinito"
     //Aquí la ALU comprobaría si todos los números del exponente son 1s
 
-//    if(expA==255||expB==255){
+    if(expA>=255){
 
-//            ui->rB->setText("infinito");
-//            ui->rD->setText("NaN");
-//            ui->rH->setText("NaN");
-//        }
-
-//        return;
-//    }
+        ui->rD->setText((signoA==0)?"inf":"-inf");
+        binaryWriteIn(ui->rB,signoA,255,0);
+        hexWriteIn(ui->rH,signoA,255,0);
 
 
+        return;
+    }else if(expB>=255){
+
+        ui->rD->setText("0");
+        binaryWriteIn(ui->rB,0,0,0);
+        hexWriteIn(ui->rH,0,0,0);
 
 
+        return;
+    }
 
     // 1.-Escalamos a [1,2)
 
@@ -605,7 +606,7 @@ void MainWindow::on_pushButton_3_clicked()
     if(exponenteDiv>=255){
         exponenteDiv=255;
     }
-    if(expA==255||expB==255){
+    if(exponenteDiv==255){
 
             ui->rD->setText((signoDiv==0)?"inf":"-inf");
             binaryWriteIn(ui->rB,signoDiv,255,0);
