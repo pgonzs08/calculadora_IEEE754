@@ -13,10 +13,6 @@ MainWindow::MainWindow(QWidget *parent)
     bitPos.push_back(1);
 
     for(int i = 1; i < 32; i++) bitPos.push_back(2*bitPos.at(i-1));
-
-    for(int i = 0; i < 32; i++) std::cout << " " << bitPos.at(i);
-
-
 }
 
 MainWindow::~MainWindow()
@@ -80,16 +76,14 @@ float MainWindow::aluAdd(float op1, float op2){
     //Paso 3
     unsigned int expR = expA;
     unsigned int d = expA - expB;
-    d = (d>=0)? d:-d;
     //Paso 4
 
-    if(signoA!=signoB) manB = (~manB)+1-excsBits;
+    if(signoA!=signoB) manB = (~manB)%0b1000000000000000000000000+1;
 
     //Paso 5
     unsigned int P = manB;
-    std::cout << P<< std::endl;
     //Paso 6
-    if(d>=3){
+    if(d>=3 && d < 25){
         g = (bitPos.at(d-1)&P)!=0;
         r = (bitPos.at(d-2)&P)!=0;
         st = (bitPos.at(d-3)&P)!=0;
@@ -110,7 +104,7 @@ float MainWindow::aluAdd(float op1, float op2){
 
     //Paso 9
     if(signoA!=signoB && (P & bitPos.at(23)) != 0 && C == 0){
-        P = ~P+1;
+        P = (~P)%0b1000000000000000000000000+1;
         compP = true;
     }
 
@@ -148,13 +142,14 @@ float MainWindow::aluAdd(float op1, float op2){
 
         expR -= k;
 
+        if(P == 0) expR = 0;
+
     }
 
     //Paso 11:
-    if((r==1 && st == 1)||(r==1 && st == 0 && P%2)){
-        unsigned int aux = P;
+    if((r==1 && st == 1)||(r==1 && st == 0 && P%2 == 1)){
+        unsigned int C2 = calcularAcarreo(P, 0b100000000000000000000,0,0);
         P = P+1;
-        unsigned int C2 = P < aux;
 
         if(C2) {
             P >>= 1;
@@ -400,10 +395,6 @@ void MainWindow::on_pushButton_3_clicked()
         ui->rD->setText(QString::number(MainWindow::denormalCalculator(signoDiv,manX)));
     }
 }
-
-
-
-
 
 float MainWindow::denormalCalculator(unsigned int sign, unsigned int mantissa){
     float preMantissa =1-ConversorIEEE754::IEEtofloat(0,127,mantissa);
