@@ -28,6 +28,8 @@ private slots:
 
 private:
 
+    float denormalCalculator(unsigned int sign, unsigned int mantissa);
+
     float aluMultiply(float op1, float op2);
 
     void binaryWriteIn(QLineEdit* child,  unsigned int sign, unsigned int exp, unsigned int mantisa);
