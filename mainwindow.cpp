@@ -258,7 +258,8 @@ void MainWindow::on_pushButton_3_clicked()
     float op1 = ui->opD1->text().toFloat();
     float op2 = ui->opD2->text().toFloat();
 
-    ui->rD->setText(QString::number(op1/op2));
+
+
 
     //Pasos previos
 
@@ -268,12 +269,64 @@ void MainWindow::on_pushButton_3_clicked()
     unsigned int expA = ConversorIEEE754::floattoIEEExp(op1);
     unsigned int expB = ConversorIEEE754::floattoIEEExp(op2);
 
-    unsigned int manA = ConversorIEEE754::floattoIEEMantisa(op1) + bitPos.at(23);
-    unsigned int manB = ConversorIEEE754::floattoIEEMantisa(op2) + bitPos.at(23);
+    unsigned int manA = ConversorIEEE754::floattoIEEMantisa(op1);// + bitPos.at(23);
+    unsigned int manB = ConversorIEEE754::floattoIEEMantisa(op2);// + bitPos.at(23);
 
 
-    binaryWriteIn( ui->opB1, signoA, expA, manA-bitPos.at(23));
-    binaryWriteIn( ui->opB2, signoB, expB, manB-bitPos.at(23));
+
+
+
+    binaryWriteIn( ui->opB1, signoA, expA, manA);
+    binaryWriteIn( ui->opB2, signoB, expB, manB);
+    hexWriteIn(ui->opH1, signoA, expA, manA);
+    hexWriteIn(ui->opH2, signoB, expB, manB);
+
+    //Caso del cero
+
+    if(expB==0&&manB==0){
+        if(signoA==1){
+            ui->rB->setText("+infinito");
+            ui->rD->setText("+infinito");
+            ui->rH->setText("+infinito");
+         }else{
+            ui->rB->setText("-infinito");
+            ui->rD->setText("-infinito");
+            ui->rH->setText("-infinito");
+
+        }
+
+        return;
+    }
+    //Arreglo para los denormales exponente -127 pasa a ser -126
+
+    if(expA==0){
+
+        expA=1;
+
+    }
+
+    if(expB==0){
+
+        expB=1;
+
+    }
+
+
+
+
+
+    //Casos de "infinito"
+    //Aquí la ALU comprobaría si todos los números del exponente son 1s
+
+    if(expA==255||expB==255){
+        ui->rB->setText("NaN");
+        ui->rD->setText("NaN");
+        ui->rH->setText("NaN");
+        return;
+    }
+
+
+
 
 
     // 1.-Escalamos a [1,2)
@@ -285,28 +338,26 @@ void MainWindow::on_pushButton_3_clicked()
 
     //2.-Aproximamos b'=1/b
 
-    float inversoB;
-    if(escB<1.25)
-    {
-        inversoB=1;
-    }else {
-        inversoB=0.8;
-    }
+    float inversoB=(escB<1.25)? 1.25:0.8;
+
+
 
     //3.- Asignamos x e y sub cero
-    float x=escA*inversoB;
-    float y=escB*inversoB;
+    float x= MainWindow::aluMultiply(escA,inversoB);
+    float y= MainWindow::aluMultiply(escB,inversoB);
     //4.-Iteramos hasta tener la precision correcta
     float lastx;
+    float r;
     do{
-        float r=2-y;
-        y*=r;
+        r=2-y;
+        y=MainWindow::aluMultiply(y,r);
         lastx=x;
-        x*=r;
-    }while((x-lastx)>=0.0001);
+        x=MainWindow::aluMultiply(x,r);
+
+    }while(abs(x-lastx)>=0.0001);
 
     //Ahora mismo x es a*1/b
-    unsigned int signoX = ConversorIEEE754::floattoIEESign(x);
+    //unsigned int signoX = ConversorIEEE754::floattoIEESign(x);
 
     unsigned int expX = ConversorIEEE754::floattoIEEExp(x);
 
@@ -315,10 +366,7 @@ void MainWindow::on_pushButton_3_clicked()
 
     //5.-Signo
 
-    unsigned int signoDiv;
-    if(signoA==signoB){
-        signoDiv=0;
-    }else signoDiv=1;
+    unsigned int signoDiv =(signoA==signoB)? 0:1;
 
     //6.-Exponente
 
