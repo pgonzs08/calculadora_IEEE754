@@ -207,7 +207,7 @@ float MainWindow::aluMultiply(float op1, float op2){
     //Paso 1:
     unsigned int signoR = signoA ^ signoB;
     //Paso 2:
-    unsigned int expR = expA + expB - 0b1111111;
+    int expR = expA + expB - 0b1111111;
 
     //Paso 3:
     //Paso 3i:
@@ -239,9 +239,7 @@ float MainWindow::aluMultiply(float op1, float op2){
     for(int i = 0; i < 23; i++) st |= (A & bitPos.at(i))!= 0;
 
     //Paso 3v:
-    if((r&&st) ||(r&&!st&&P%2)){
-        P = P+1;
-    }
+    if((r&&st) ||(r&&!st&&P%2)) P+=1;
 
     //DESBORDAMIENTOS
     if(expR>0b11111111){
@@ -256,12 +254,8 @@ float MainWindow::aluMultiply(float op1, float op2){
         expR = 0;
 
     }
-    else{
-        float salida = ConversorIEEE754::IEEtofloat(signoR, expR, P);
-        return salida;
-    }
 
-
+    return ConversorIEEE754::IEEtofloat(signoR, expR, P);
 
 }
 
