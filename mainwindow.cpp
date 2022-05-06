@@ -488,7 +488,7 @@ float MainWindow::aluMultiply(float op1, float op2){
 
 void MainWindow::on_pushButton_3_clicked()
 {
-float op1 = ui->opD1->text().toFloat();
+    float op1 = ui->opD1->text().toFloat();
     float op2 = ui->opD2->text().toFloat();
 
 
@@ -517,17 +517,10 @@ float op1 = ui->opD1->text().toFloat();
     //Caso del cero
 
     if(expB==0&&manB==0){
-        if(signoA==1){
-            ui->rB->setText("+infinito");
-            ui->rD->setText("+infinito");
-            ui->rH->setText("+infinito");
-         }else{
-            ui->rB->setText("-infinito");
-            ui->rD->setText("-infinito");
-            ui->rH->setText("-infinito");
 
-        }
-
+            ui->rB->setText("NaN");
+            ui->rD->setText("NaN");
+            ui->rH->setText("NaN");
         return;
     }
 //    //Arreglo para los denormales exponente -127 pasa a ser -126
@@ -551,12 +544,15 @@ float op1 = ui->opD1->text().toFloat();
     //Casos de "infinito"
     //Aquí la ALU comprobaría si todos los números del exponente son 1s
 
-    if(expA==255||expB==255){
-        ui->rB->setText("NaN");
-        ui->rD->setText("NaN");
-        ui->rH->setText("NaN");
-        return;
-    }
+//    if(expA==255||expB==255){
+
+//            ui->rB->setText("infinito");
+//            ui->rD->setText("NaN");
+//            ui->rH->setText("NaN");
+//        }
+
+//        return;
+//    }
 
 
 
@@ -610,9 +606,11 @@ float op1 = ui->opD1->text().toFloat();
         exponenteDiv=255;
     }
     if(expA==255||expB==255){
-        ui->rB->setText("NaN");
-        ui->rD->setText("NaN");
-        ui->rH->setText("NaN");
+
+            ui->rD->setText((signoDiv==0)?"inf":"-inf");
+            binaryWriteIn(ui->rB,signoDiv,255,0);
+            hexWriteIn(ui->rH,signoDiv,255,0);
+
         return;
     }
     //7.- Final
