@@ -29,6 +29,8 @@ private slots:
 private:
 
     float denormalCalculator(unsigned int sign, unsigned int mantissa);
+    
+    float aluAdd(float op1,float op2);
 
     float aluMultiply(float op1, float op2);
 
