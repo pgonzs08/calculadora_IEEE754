@@ -167,6 +167,154 @@ void MainWindow::on_pushButton_clicked()
 
 }
 
+float MainWindow::aluAdd(float op1, float op2){
+    //Pasos previos
+
+    unsigned int signoA = ConversorIEEE754::floattoIEESign(op1);
+    unsigned int signoB = ConversorIEEE754::floattoIEESign(op2);
+
+    unsigned int expA = ConversorIEEE754::floattoIEEExp(op1);
+    unsigned int expB = ConversorIEEE754::floattoIEEExp(op2);
+
+    unsigned int manA = ConversorIEEE754::floattoIEEMantisa(op1) + bitPos.at(23);
+    unsigned int manB = ConversorIEEE754::floattoIEEMantisa(op2) + bitPos.at(23);
+
+
+    const unsigned int excsBits = bitPos.at(31)+bitPos.at(30)+bitPos.at(29)+bitPos.at(28)+bitPos.at(27)+bitPos.at(26)+bitPos.at(25)+bitPos.at(24);
+    std::cout << "excsBits = " << excsBits << std::endl;
+
+    //Paso 1
+    std::cout << "Paso1: "<<std::endl;
+    unsigned int signoSuma;
+
+    unsigned int g = 0; unsigned int r = 0; unsigned int st = 0;
+    bool opChanged = false;
+    bool compP = false;
+
+    //Paso 2
+    std::cout << "Paso2: ";
+    if(expA < expB){
+        expA = ConversorIEEE754::floattoIEEExp(op2);
+        expB = ConversorIEEE754::floattoIEEExp(op1);
+        manA = ConversorIEEE754::floattoIEEMantisa(op2) + bitPos.at(23);
+        manB = ConversorIEEE754::floattoIEEMantisa(op1) + bitPos.at(23);
+        signoA = ConversorIEEE754::floattoIEESign(op2);
+        signoB = ConversorIEEE754::floattoIEESign(op1);
+        opChanged = true;
+    }
+    std::cout <<" A = "<< signoA << expA -127 << manA - bitPos.at(23) <<", B = "<< signoB << expB -127 << manB - bitPos.at(23) << std::endl;
+    //Paso 3
+    std::cout << "Paso3: ";
+    unsigned int expR = expA;
+    unsigned int d = expA - expB;
+    d = (d>=0)? d:-d;
+    std::cout << d<< std::endl;
+    //Paso 4
+
+    if(signoA!=signoB){
+        std::cout << "Paso4: ";
+        manB = (~manB)+1-excsBits;
+        std::cout <<"manB = "<<~(manB-1) - bitPos.at(23)-excsBits<<" ~manB = "<<manB -excsBits<< std::endl;
+    }
+
+    //Paso 5
+    std::cout << "Paso5: ";
+    unsigned int P = manB;
+    std::cout << P<< std::endl;
+    //Paso 6
+    std::cout << "Paso6: ";
+    if(d>=3){
+        g = (bitPos.at(d-1)&P)!=0;
+        r = (bitPos.at(d-2)&P)!=0;
+        st = (bitPos.at(d-3)&P)!=0;
+    }
+    for(int i = d-3; i > 0 && !st; i--) st = st|(bitPos.at(d-i)&P);
+    std::cout <<"g = "<< g <<", r = "<<r<<", st = "<<st<< std::endl;
+    //Paso 7
+    std::cout << "Paso7: ";
+    if(signoA!=signoB){
+        for(unsigned int i = 0; i < d; i++){
+            P >>= 1;
+            P += bitPos.at(23);
+        }
+    }
+    else P = P>>d;
+    std::cout << P<< std::endl;
+    //Paso 8
+    std::cout << "Paso8: " << " P = " << P << ", A = " << manA;
+    unsigned int C = 0;
+    C = calcularAcarreo(manA, P, 0, 0);
+    P = manA + P;
+    std::cout << ", R = " << P << ", C = " << C << std::endl;
+
+    //Paso 9
+    if(signoA!=signoB && (P & bitPos.at(23)) != 0 && C == 0){
+        std::cout << "Paso9"<< std::endl;
+        P = ~P+1;
+        compP = true;
+    }
+
+    //Paso 10
+    if(signoA == signoB && C==1){
+
+        st = g | r | st;
+
+        std::cout << "Paso10a"<< std::endl;
+
+        r = P%2;
+
+        P = P>>1;
+        P += bitPos.at(23);
+
+        expR++;
+
+    }
+    else{
+
+        int k = 0;
+        std::cout << "Paso10b: P = "<< P;
+        for(unsigned int aux = P; aux != 0 && (aux & bitPos.at(23)) == 0; aux <<=1) k++;
+        std::cout << " k = " << k<< std::endl;
+        if (k == 0){
+            st = r|st;
+            r = g;
+        }
+        else{
+            st = 0; r = 0;
+        }
+
+        for(int i = 0; i < k; i++){
+
+            P<<=1;
+            P += g;
+
+        }
+
+        expR -= k;
+
+    }
+
+    //Paso 11:
+    if((r==1 && st == 1)||(r==1 && st == 0 && P%2)){
+        unsigned int aux = P;
+        P = P+1;
+        unsigned int C2 = P < aux;
+
+        if(C2) {
+            P >>= 1;
+            P += bitPos.at(23);
+            expR++;
+        }
+    }
+
+    //Paso 12:
+
+    signoSuma = (!opChanged && compP) ? signoB:signoA;
+
+    return ConversorIEEE754::IEEtofloat(signoSuma, expR, P);
+
+}
+
 void MainWindow::on_pushButton_2_clicked()
 {
 
