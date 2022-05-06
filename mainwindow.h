@@ -23,16 +23,16 @@ private slots:
     void on_pushButton_2_clicked();
 
     void on_pushButton_3_clicked();
-    
+
     void on_Reset_clicked();
 
 private:
 
+    float aluMultiply(float op1, float op2);
+
     void binaryWriteIn(QLineEdit* child,  unsigned int sign, unsigned int exp, unsigned int mantisa);
 
     unsigned int calcularAcarreo(unsigned int manA, unsigned int manB, unsigned int pos, unsigned int acarreoActual);
-
-    bool isDenormal(QString text);
 
     void hexWriteIn(QLineEdit* child,  unsigned int sign, unsigned int exp, unsigned int mantisa);
 
